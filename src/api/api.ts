@@ -1,8 +1,7 @@
 import { ShareGPTSubmitBodyInterface } from '@type/api';
-import { ConfigInterface, MessageInterface, ModelOptions } from '@type/chat';
+import { ConfigInterface, MessageInterface } from '@type/chat';
 import { isAzureEndpoint } from '@utils/api';
 
-// Cập nhật kiểu ModelOptions để bao gồm các mô hình cần thiết
 export type ModelOptions =
   | 'gpt-4-turbo'
   | 'gpt-3.5-turbo'
@@ -18,7 +17,6 @@ export type ModelOptions =
   | 'gemini-1.5-pro-latest'
   | 'llama-3.1-70b';
 
-// Hàm lấy kết quả chat từ API
 export const getChatCompletion = async (
   endpoint: string,
   messages: MessageInterface[],
@@ -34,8 +32,6 @@ export const getChatCompletion = async (
 
   if (isAzureEndpoint(endpoint) && apiKey) {
     headers['api-key'] = apiKey;
-
-    // Cập nhật ánh xạ mô hình cho các giá trị mới
     const modelmapping: Partial<Record<ModelOptions, string>> = {
       'gpt-3.5-turbo': 'gpt-35-turbo',
       'gpt-3.5-turbo-16k': 'gpt-35-turbo-16k',
@@ -53,8 +49,6 @@ export const getChatCompletion = async (
     };
 
     const model = modelmapping[config.model as ModelOptions] || config.model;
-
-    // Cập nhật API version cho gpt-4 và gpt-4-32k
     const apiVersion =
       model === 'gpt-4' || model === 'gpt-4-32k'
         ? '2023-07-01-preview'
@@ -81,11 +75,9 @@ export const getChatCompletion = async (
   });
   if (!response.ok) throw new Error(await response.text());
 
-  const data = await response.json();
-  return data;
+  return await response.json();
 };
 
-// Hàm lấy kết quả chat từ API theo dạng stream
 export const getChatCompletionStream = async (
   endpoint: string,
   messages: MessageInterface[],
@@ -101,16 +93,12 @@ export const getChatCompletionStream = async (
 
   if (isAzureEndpoint(endpoint) && apiKey) {
     headers['api-key'] = apiKey;
-
-    // Cập nhật ánh xạ mô hình cho các giá trị mới
     const modelmapping: Partial<Record<ModelOptions, string>> = {
       'gpt-3.5-turbo': 'gpt-35-turbo',
       'gpt-3.5-turbo-16k': 'gpt-35-turbo-16k',
     };
 
     const model = modelmapping[config.model as ModelOptions] || config.model;
-
-    // Cập nhật API version cho gpt-4 và gpt-4-32k
     const apiVersion =
       model === 'gpt-4' || model === 'gpt-4-32k'
         ? '2023-07-01-preview'
@@ -136,38 +124,11 @@ export const getChatCompletionStream = async (
       stream: true,
     }),
   });
-  if (response.status === 404 || response.status === 405) {
-    const text = await response.text();
+  if (!response.ok) throw new Error(await response.text());
 
-    if (text.includes('model_not_found')) {
-      throw new Error(
-        text +
-          '\nMessage from Better ChatGPT:\nPlease ensure that you have access to the GPT-4 API!'
-      );
-    } else {
-      throw new Error(
-        'Message from Better ChatGPT:\nInvalid API endpoint! We recommend you to check your free API endpoint.'
-      );
-    }
-  }
-
-  if (response.status === 429 || !response.ok) {
-    const text = await response.text();
-    let error = text;
-    if (text.includes('insufficient_quota')) {
-      error +=
-        '\nMessage from Better ChatGPT:\nWe recommend changing your API endpoint or API key';
-    } else if (response.status === 429) {
-      error += '\nRate limited!';
-    }
-    throw new Error(error);
-  }
-
-  const stream = response.body;
-  return stream;
+  return response.body;
 };
 
-// Hàm gửi yêu cầu ShareGPT
 export const submitShareGPT = async (body: ShareGPTSubmitBodyInterface) => {
   const request = await fetch('https://sharegpt.com/api/conversations', {
     body: JSON.stringify(body),
