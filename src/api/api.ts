@@ -2,6 +2,23 @@ import { ShareGPTSubmitBodyInterface } from '@type/api';
 import { ConfigInterface, MessageInterface, ModelOptions } from '@type/chat';
 import { isAzureEndpoint } from '@utils/api';
 
+// Cập nhật kiểu ModelOptions để bao gồm các mô hình cần thiết
+export type ModelOptions =
+  | 'gpt-4-turbo'
+  | 'gpt-3.5-turbo'
+  | 'gpt-3.5-turbo-16k'
+  | 'gpt-3.5-turbo-1106'
+  | 'gpt-4o'
+  | 'gpt-4o-mini'
+  | 'gpt-4'
+  | 'o1-mini'
+  | 'o1-preview'
+  | 'claude-3-5-sonnet-20241022'
+  | 'claude-3-haiku-20240307'
+  | 'gemini-1.5-pro-latest'
+  | 'llama-3.1-70b';
+
+// Hàm lấy kết quả chat từ API
 export const getChatCompletion = async (
   endpoint: string,
   messages: MessageInterface[],
@@ -18,11 +35,11 @@ export const getChatCompletion = async (
   if (isAzureEndpoint(endpoint) && apiKey) {
     headers['api-key'] = apiKey;
 
+    // Cập nhật ánh xạ mô hình cho các giá trị mới
     const modelmapping: Partial<Record<ModelOptions, string>> = {
       'gpt-3.5-turbo': 'gpt-35-turbo',
       'gpt-3.5-turbo-16k': 'gpt-35-turbo-16k',
       'gpt-3.5-turbo-1106': 'gpt-35-turbo-1106',
-      'gpt-3.5-turbo-0125': 'gpt-35-turbo-0125',
       'gpt-4o': 'gpt-4o',
       'gpt-4o-mini': 'gpt-4o-mini',
       'gpt-4-turbo': 'gpt-4-turbo',
@@ -35,9 +52,9 @@ export const getChatCompletion = async (
       'llama-3.1-70b': 'llama-3.1-70b',
     };
 
-    const model = modelmapping[config.model] || config.model;
+    const model = modelmapping[config.model as ModelOptions] || config.model;
 
-    // set api version to 2023-07-01-preview for gpt-4 and gpt-4-32k, otherwise use 2023-03-15-preview
+    // Cập nhật API version cho gpt-4 và gpt-4-32k
     const apiVersion =
       model === 'gpt-4' || model === 'gpt-4-32k'
         ? '2023-07-01-preview'
@@ -68,6 +85,7 @@ export const getChatCompletion = async (
   return data;
 };
 
+// Hàm lấy kết quả chat từ API theo dạng stream
 export const getChatCompletionStream = async (
   endpoint: string,
   messages: MessageInterface[],
@@ -84,29 +102,20 @@ export const getChatCompletionStream = async (
   if (isAzureEndpoint(endpoint) && apiKey) {
     headers['api-key'] = apiKey;
 
+    // Cập nhật ánh xạ mô hình cho các giá trị mới
     const modelmapping: Partial<Record<ModelOptions, string>> = {
       'gpt-3.5-turbo': 'gpt-35-turbo',
       'gpt-3.5-turbo-16k': 'gpt-35-turbo-16k',
-      'gpt-3.5-turbo-1106': 'gpt-35-turbo-1106',
-      'gpt-4o': 'gpt-4o',
-      'gpt-4o-mini': 'gpt-4o-mini',
-      'gpt-4-turbo': 'gpt-4-turbo',
-      'gpt-4': 'gpt-4',
-      'o1-mini': 'o1-mini',
-      'o1-preview': 'o1-preview',
-      'claude-3-5-sonnet-20241022': 'claude-3-5-sonnet',
-      'claude-3-haiku-20240307': 'claude-3-haiku',
-      'gemini-1.5-pro-latest': 'gemini-1.5-pro',
-      'llama-3.1-70b': 'llama-3.1-70b',
     };
 
-    const model = modelmapping[config.model] || config.model;
+    const model = modelmapping[config.model as ModelOptions] || config.model;
 
-    // set api version to 2023-07-01-preview for gpt-4 and gpt-4-32k, otherwise use 2023-03-15-preview
+    // Cập nhật API version cho gpt-4 và gpt-4-32k
     const apiVersion =
       model === 'gpt-4' || model === 'gpt-4-32k'
         ? '2023-07-01-preview'
         : '2023-03-15-preview';
+
     const path = `openai/deployments/${model}/chat/completions?api-version=${apiVersion}`;
 
     if (!endpoint.endsWith(path)) {
@@ -158,6 +167,7 @@ export const getChatCompletionStream = async (
   return stream;
 };
 
+// Hàm gửi yêu cầu ShareGPT
 export const submitShareGPT = async (body: ShareGPTSubmitBodyInterface) => {
   const request = await fetch('https://sharegpt.com/api/conversations', {
     body: JSON.stringify(body),
