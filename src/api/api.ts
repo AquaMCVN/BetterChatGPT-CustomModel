@@ -4,6 +4,7 @@ import { isAzureEndpoint } from '@utils/api';
 
 export type ModelOptions =
   | 'gpt-4-turbo'
+  | 'gpt-3.5-turbo'
   | 'gpt-3.5-turbo-16k'
   | 'gpt-3.5-turbo-1106'
   | 'gpt-4o'
@@ -32,6 +33,7 @@ export const getChatCompletion = async (
   if (isAzureEndpoint(endpoint) && apiKey) {
     headers['api-key'] = apiKey;
     const modelmapping: Partial<Record<ModelOptions, string>> = {
+      'gpt-3.5-turbo': 'gpt-35-turbo',
       'gpt-3.5-turbo-16k': 'gpt-35-turbo-16k',
       'gpt-3.5-turbo-1106': 'gpt-35-turbo-1106',
       'gpt-4o': 'gpt-4o',
@@ -92,6 +94,7 @@ export const getChatCompletionStream = async (
   if (isAzureEndpoint(endpoint) && apiKey) {
     headers['api-key'] = apiKey;
     const modelmapping: Partial<Record<ModelOptions, string>> = {
+      'gpt-3.5-turbo': 'gpt-35-turbo',
       'gpt-3.5-turbo-16k': 'gpt-35-turbo-16k',
     };
 
