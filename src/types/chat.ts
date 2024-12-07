@@ -60,7 +60,7 @@ export type ModelOptions =
   | 'o1-preview'
   | 'claude-3-5-sonnet-20241022'
   | 'claude-3-haiku-20240307'
-  | 'gemini-1.5-pro-latest';
+  | 'gemini-1.5-pro-latest'
   | 'llama-3.1-70b';
 // | 'gpt-4-0314'
 // | 'gpt-4-32k-0314'
