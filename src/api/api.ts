@@ -19,19 +19,28 @@ export const getChatCompletion = async (
     headers['api-key'] = apiKey;
 
     const modelmapping: Partial<Record<ModelOptions, string>> = {
-      'gpt-3.5-turbo': 'gpt-35-turbo',
+      'gpt-4o': 'gpt-4o',
+      'gpt-4o-mini': 'gpt-4o-mini',
+      'gpt-4-turbo': 'gpt-4-turbo',
+      'gpt-4': 'gpt-4',
       'gpt-3.5-turbo-16k': 'gpt-35-turbo-16k',
       'gpt-3.5-turbo-1106': 'gpt-35-turbo-1106',
-      'gpt-3.5-turbo-0125': 'gpt-35-turbo-0125',
+      'o1-mini': 'o1-mini',
+      'o1-preview': 'o1-preview',
+      'claude-3-5-sonnet-20241022': 'claude-3-5-sonnet',
+      'claude-3-haiku-20240307': 'claude-3-haiku',
+      'gemini-1.5-pro-latest': 'gemini-1.5-pro',
+      'llama-3.1-70b': 'llama-3.1-70b',
     };
 
     const model = modelmapping[config.model] || config.model;
 
-    // set api version to 2023-07-01-preview for gpt-4 and gpt-4-32k, otherwise use 2023-03-15-preview
     const apiVersion =
-      model === 'gpt-4' || model === 'gpt-4-32k'
+      ['gpt-4', 'gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo'].includes(model)
         ? '2023-07-01-preview'
-        : '2023-03-15-preview';
+        : ['gpt-3.5-turbo-16k', 'gpt-3.5-turbo-1106'].includes(model)
+        ? '2023-03-15-preview'
+        : '2023-01-01';
 
     const path = `openai/deployments/${model}/chat/completions?api-version=${apiVersion}`;
 
@@ -75,17 +84,29 @@ export const getChatCompletionStream = async (
     headers['api-key'] = apiKey;
 
     const modelmapping: Partial<Record<ModelOptions, string>> = {
-      'gpt-3.5-turbo': 'gpt-35-turbo',
+      'gpt-4o': 'gpt-4o',
+      'gpt-4o-mini': 'gpt-4o-mini',
+      'gpt-4-turbo': 'gpt-4-turbo',
+      'gpt-4': 'gpt-4',
       'gpt-3.5-turbo-16k': 'gpt-35-turbo-16k',
+      'gpt-3.5-turbo-1106': 'gpt-35-turbo-1106',
+      'o1-mini': 'o1-mini',
+      'o1-preview': 'o1-preview',
+      'claude-3-5-sonnet-20241022': 'claude-3-5-sonnet',
+      'claude-3-haiku-20240307': 'claude-3-haiku',
+      'gemini-1.5-pro-latest': 'gemini-1.5-pro',
+      'llama-3.1-70b': 'llama-3.1-70b',
     };
 
     const model = modelmapping[config.model] || config.model;
 
-    // set api version to 2023-07-01-preview for gpt-4 and gpt-4-32k, otherwise use 2023-03-15-preview
     const apiVersion =
-      model === 'gpt-4' || model === 'gpt-4-32k'
+      ['gpt-4', 'gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo'].includes(model)
         ? '2023-07-01-preview'
-        : '2023-03-15-preview';
+        : ['gpt-3.5-turbo-16k', 'gpt-3.5-turbo-1106'].includes(model)
+        ? '2023-03-15-preview'
+        : '2023-01-01';
+
     const path = `openai/deployments/${model}/chat/completions?api-version=${apiVersion}`;
 
     if (!endpoint.endsWith(path)) {
